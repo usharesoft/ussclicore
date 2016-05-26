@@ -1,4 +1,4 @@
-from setuptools import setup,find_packages
+from setuptools import setup,find_packages,Command
 import os
 import sys
 
@@ -18,6 +18,15 @@ if os.name != "nt":
 else:   #On Windows
     requires.append('pyreadline==2.0')
 
+class CleanCommand(Command):
+    """Custom clean command to tidy up the project root."""
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        os.system('rm -vrf ./build ./dist ./*.pyc ./*.egg-info | find -iname "*.pyc" -exec rm {} +')
                     
 setup (
   install_requires=requires,
@@ -45,7 +54,11 @@ setup (
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
     ),
-       
+
+  # ... custom build command
+  cmdclass={
+    'clean': CleanCommand,
+  },
   
   #long_description= 'Long description of the package',
   
