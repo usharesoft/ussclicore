@@ -161,12 +161,18 @@ class Cmd(Cmd2, object):
 				#if not data or len(data) == 0:
 				#	data = str(self.nohelp % (arg,))
 
-				data = data.split('\n', 1)[0]
-				return  (data[:(column-3)] + '...') if len(data) > column else data
+				data = data.split('\n\n', 1)[0].replace("\n", " ")
+				return splitHelp(data, column)
 			finally:
 				# Restore
 				keepstate.restore()
 				keepsys.restore()
+
+		def splitHelp(data, columnSize):
+			rows = []
+			for n in range(0, len(data), columnSize):
+				rows.append(data[n: n + columnSize])
+			return rows
 
 		# Forward help
 		args = re.split('\s+', arg, 1)		
@@ -214,7 +220,10 @@ class Cmd(Cmd2, object):
 			cmdMaxCol = 30
 			helpMaxCol = self.maxcol - cmdMaxCol - 3
 			for cmd in cmds_doc:
-				stdout.write(str('{0:<'+str(cmdMaxCol)+'}| {1:<' + str(helpMaxCol) + '}\n').format(cmd, sumHelp(cmd, helpMaxCol)))
+				rows = sumHelp(cmd, helpMaxCol)
+				stdout.write(str('{0:<'+str(cmdMaxCol)+'}| {1:<' + str(helpMaxCol) + '}\n').format(cmd, rows[0]))
+				for n in range(1, len(rows)):
+						stdout.write(str('{0:<'+str(cmdMaxCol)+'}| {1:<' + str(helpMaxCol) + '}\n').format("", rows[n]))
 
 	def parsed(self, raw, **kwargs):
 		if isinstance(raw, ParsedString):
