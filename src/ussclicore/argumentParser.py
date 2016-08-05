@@ -32,7 +32,14 @@ class ArgumentParser(argparse.ArgumentParser):
 
                 # determine help from format above
                 return formatter.format_help()
-
+	
+	# Catch the system exit exception and return an empty object if the helper is called
+	def parse_args(self, args):
+		try:
+			return super(ArgumentParser,self).parse_args(args)
+		except SystemExit as e :
+                        return
+                        
 class CoreArgumentParser(ArgumentParser):
             
         def format_help(self):
