@@ -1,68 +1,45 @@
-# To change this license header, choose License Headers in Project Properties.
-# To change this template file, choose Tools | Templates
-# and open the template in the editor.
+__author__ = "UShareSoft"
 
-__author__="UShareSoft"
-
-import urllib2
-import traceback
+import requests
 from hurry.filesize import size
-from progressbar import AnimatedMarker, Bar, BouncingBar, Counter, ETA, \
-    FileTransferSpeed, FormatLabel, Percentage, \
-    ProgressBar, ReverseBar, RotatingMarker, \
-    SimpleProgress, Timer
+from progressbar import Bar, ETA, Percentage, ProgressBar
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 import printer
 
-class Download():
-        
-        def __init__(self, url, dest_file_name):
-                self.url = url
-                self.dest_file_name = dest_file_name
-
-        def chunk_read(self, response, file, chunk_size=8192, report_hook=False):
-                # inspired by http://stackoverflow.com/questions/2028517/python-urllib2-progress-hook
-                total_size = response.info().getheader('Content-Length').strip()
-                total_size = int(total_size)
-                bytes = 0
-
-                printer.out("Ready to download "+size(total_size), printer.INFO)
-
-                #widgets = ['Status: ', Percentage(), ' ', Bar('>'), ' ', ETA(), ' ', FileTransferSpeed()]
-                widgets = ['Status: ', Percentage(), ' ', Bar('>'), ' ', ETA()]
-                self.pbar = ProgressBar(widgets=widgets, maxval=100).start()
-
-                while True:
-                        chunk = response.read(chunk_size)
-                        file.write(chunk)
-                        bytes += len(chunk)
-                        if not chunk:
-                                break
-                        if report_hook:
-                                self.progress_update((bytes/chunk_size), chunk_size, total_size)
-
-                return bytes
-
-        def start(self):
-                file = open(self.dest_file_name, 'wb')
-                try:
-                        response = urllib2.urlopen(self.url)
-                        bytes = self.chunk_read(response, file, report_hook=True)
-                        self.progress_finish()
-                except urllib2.HTTPError as e:
-                        printer.out("Error getting URL: "+self.url, printer.ERROR)
-                        raise e
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
+class Download:
+    def __init__(self, url, output_file_name, verify_ssl_certificate=True):
+        self.url = url
+        self.output_file_name = output_file_name
+        self.verify = verify_ssl_certificate
 
-        def progress_update(self, count, blockSize, totalSize):
-                percent=None
-                if totalSize-blockSize<=0:
-                        percent=50
-                else:
-                        if totalSize-(count*blockSize)>=0:
-                                percent = int(count*blockSize*100/totalSize)
-                if percent is not None:
-                        self.pbar.update(percent)
-                
-        def progress_finish(self):
-                self.pbar.finish()
+    def read_chunk(self, response, output_file, chunk_size=8192, report_hook=False):
+        total_size = int(response.headers['Content-Length'])
+        current_chunk = 0
+
+        printer.out("Ready to download " + size(total_size), printer.INFO)
+
+        widgets = ['Status: ', Percentage(), ' ', Bar('>'), ' ', ETA()]
+        progress_bar = ProgressBar(widgets=widgets, maxval=100).start()
+
+        for chunk in response.iter_content(chunk_size):
+            output_file.write(chunk)
+            current_chunk += 1
+            if report_hook:
+                percent = int(current_chunk * chunk_size * 100 / total_size)
+                progress_bar.update(percent)
+
+        progress_bar.finish()
+
+    def start(self):
+        output_file = open(self.output_file_name, 'wb')
+        try:
+            response = requests.get(self.url, stream=True, verify=self.verify)
+            response.raise_for_status()
+            self.read_chunk(response, output_file, report_hook=True)
+        except requests.exceptions.HTTPError as e:
+            printer.out("Error getting URL: " + self.url, printer.ERROR)
+            raise e

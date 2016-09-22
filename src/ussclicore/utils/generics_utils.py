@@ -95,11 +95,11 @@ def get_remote_regex():
                 r'(?::\d+)?' # optional port
                 r'(?:/?|[/?]\S+)$')
 
-def get_file(uri, dest_file_name=None):
+def get_file(uri, dest_file_name=None, verify_ssl_certificate=True):
         try:
                 regexp = re.compile(get_remote_regex(), re.IGNORECASE)
                 if regexp.search(uri) is not None:
-                        dlUtils = download_utils.Download(uri, dest_file_name)
+                        dlUtils = download_utils.Download(uri, dest_file_name, verify_ssl_certificate)
                         try:
                             dlUtils.start()
                         except Exception, e:
