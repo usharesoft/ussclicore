@@ -13,6 +13,7 @@ requires=[
             'progressbar==2.3',
             'termcolor==1.1.0',
             'hurry.filesize==0.9',
+            'pyyaml==3.12',
          ]
 
 if os.name != "nt":

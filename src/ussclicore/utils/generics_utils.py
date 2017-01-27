@@ -8,6 +8,7 @@ from os.path import expanduser
 import os
 import urllib
 import tempfile
+import yaml
 
 import download_utils
 import printer
@@ -21,15 +22,27 @@ def extract_id(uri):
 
 def check_json_syntax(file):
         try:
-                printer.out("Validating the template file ["+file+"] ...")
                 json_data=open(file)
                 data = json.load(json_data)
                 json_data.close()
-                printer.out("Syntax of template file ["+file+"] is ok", printer.OK)
                 return data
         except ValueError as e:
                 printer.out("Syntax of template file ["+file+"] FAILED", printer.ERROR)
                 printer.out("JSON parsing error: "+str(e))
+                return
+        except IOError as e:
+                printer.out("File error: "+str(e), printer.ERROR)
+                return
+
+def check_yaml_syntax(file):
+        try:
+                yaml_data=open(file)
+                data = yaml.load(yaml_data)
+                yaml_data.close()
+                return data
+        except ValueError as e:
+                printer.out("Syntax of template file ["+file+"] FAILED", printer.ERROR)
+                printer.out("YAML parsing error: "+str(e))
                 return
         except IOError as e:
                 printer.out("File error: "+str(e), printer.ERROR)
