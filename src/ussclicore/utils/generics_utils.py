@@ -115,11 +115,13 @@ def get_file(uri, dest_file_name=None, verify_ssl_certificate=True):
                         dlUtils = download_utils.Download(uri, dest_file_name, verify_ssl_certificate)
                         try:
                             dlUtils.start()
-                        except Exception, e:
-                            return 2
+                        except Exception:
+                            raise ValueError
                 else:
                         dest_file_name, headers = urllib.urlretrieve(uri)
                 return dest_file_name
+        except ValueError:
+               return
         except Exception, e:
                 print("error downloading "+uri+": "+ str(e))
                 return
