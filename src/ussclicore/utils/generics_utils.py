@@ -113,15 +113,10 @@ def get_file(uri, dest_file_name=None, verify_ssl_certificate=True):
                 regexp = re.compile(get_remote_regex(), re.IGNORECASE)
                 if regexp.search(uri) is not None:
                         dlUtils = download_utils.Download(uri, dest_file_name, verify_ssl_certificate)
-                        try:
-                            dlUtils.start()
-                        except Exception:
-                            raise ValueError
+                        dlUtils.start()
                 else:
                         dest_file_name, headers = urllib.urlretrieve(uri)
                 return dest_file_name
-        except ValueError:
-               return
         except Exception, e:
                 print("error downloading "+uri+": "+ str(e))
                 return
