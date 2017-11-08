@@ -38,7 +38,7 @@ setup (
   install_requires=requires,
   
   name = 'ussclicore',
-  version = '1.0.9',
+  version = '1.0.10',
   description='UShareSoft cli core module',
   #long_description='',
   packages = find_packages(),
