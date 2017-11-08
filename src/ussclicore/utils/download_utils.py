@@ -30,6 +30,8 @@ class Download:
             current_chunk += 1
             if report_hook:
                 percent = int(current_chunk * chunk_size * 100 / total_size)
+                if percent > 100:
+                    percent = 100
                 progress_bar.update(percent)
 
         progress_bar.finish()
