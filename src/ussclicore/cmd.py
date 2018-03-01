@@ -473,11 +473,13 @@ class CmdUtils(BaseCmd, Cmd):
 		self.doc_leader = colored("Utility box", 'white', attrs=['bold']) + ' help'
                 
 class CoreGlobal:
-        def set_globals(self, api, login=None, password=None):
+        def set_globals(self, api, login=None, password=None, apikeys=None):
                 self.api=api
                 if login is not None:
                         self.login=login
                 if password is not None:
                         self.password=password
+                if apikeys is not None:
+                        self.apikeys=apikeys
 
 
