@@ -2,9 +2,7 @@ from setuptools import setup,find_packages,Command
 import os
 import sys
 
-
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-
 
 # Declare your packages' dependencies here, for eg:
 requires=[
@@ -33,12 +31,11 @@ class CleanCommand(Command):
     def run(self):
         os.system('rm -vrf '+ROOT_DIR+'/build '+ROOT_DIR+'/dist '+ROOT_DIR+'/*.pyc '+ROOT_DIR+'/*.egg-info')
         os.system('find '+ROOT_DIR+' -iname "*.pyc" -exec rm {} +')
-                    
+
 setup (
   install_requires=requires,
-  
   name = 'ussclicore',
-  version = '1.0.10',
+  version = '1.0.11',
   description='UShareSoft cli core module',
   #long_description='',
   packages = find_packages(),
@@ -65,7 +62,7 @@ setup (
   cmdclass={
     'clean': CleanCommand,
   },
-  
+
   #long_description= 'Long description of the package',
-  
+
 )
